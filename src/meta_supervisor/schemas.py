@@ -50,4 +50,5 @@ class MarketAnalysisRequest(BaseModel):
 
 class MarketAnalysisResponse(BaseModel):
     report: str
-    data: Dict[str, Any] 
+    data: Dict[str, Any]
+    chart_url: Optional[str] = None 
