@@ -1,0 +1,21 @@
+[project]
+name = "meta-supervisor"
+version = "0.1.0"
+description = "Meta-supervisor for Fin-Agent"
+authors = [{ name = "FinAgent-Lab", email = "dev@finagent.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.116.0",
+    "httpx>=0.28.1",
+    "konlpy>=0.6.0",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
+    "uvicorn[standard]>=0.35.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest",
+    "black",
+    "ruff"
+] 
