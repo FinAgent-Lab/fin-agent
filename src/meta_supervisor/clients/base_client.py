@@ -5,9 +5,9 @@ from ..config import settings
 
 
 class BaseClient:
-    def __init__(self, base_url: str, default_timeout: float = 30.0):
+    def __init__(self, service_name: str, base_url: str):
+        self.service_name = service_name
         self.base_url = base_url
-        self.timeout = default_timeout
 
     async def _request(
         self,
@@ -15,34 +15,24 @@ class BaseClient:
         endpoint: str,
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-    ) -> httpx.Response:
+    ) -> Dict[str, Any]:
+        """A generic async request maker."""
         url = f"{self.base_url}{endpoint}"
-        async with httpx.AsyncClient() as client:
-            try:
+        try:
+            async with httpx.AsyncClient() as client:
                 response = await client.request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    json=json,
-                    headers=headers,
-                    timeout=self.timeout,
+                    method=method, url=url, params=params, json=json, timeout=10.0
                 )
                 response.raise_for_status()
-                return response
-            except httpx.HTTPStatusError as e:
-                # Handle HTTP errors (e.g., 4xx, 5xx)
-                print(f"HTTP error occurred: {e}")
-                raise
-            except httpx.RequestError as e:
-                # Handle network-related errors
-                print(f"An error occurred while requesting {e.request.url!r}.")
-                raise
+                return response.json()
+        except httpx.RequestError as e:
+            # Log the error properly in a real application
+            # For now, re-raise as a generic exception
+            raise Exception(f"API request failed to {self.service_name}: {e}")
+        except httpx.HTTPStatusError as e:
+            raise Exception(
+                f"API request to {self.service_name} returned an error: "
+                f"{e.response.status_code} {e.response.text}"
+            ) 
 
-    async def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-        response = await self._request("GET", endpoint, params=params, headers=headers)
-        return response.json()
-
-    async def post(self, endpoint: str, json: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-        response = await self._request("POST", endpoint, json=json, headers=headers)
-        return response.json() 
+    

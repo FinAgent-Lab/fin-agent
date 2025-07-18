@@ -5,18 +5,19 @@ from typing import Any, Dict
 
 
 class TradingClient(BaseClient):
-    def __init__(self):
-        super().__init__(base_url=settings.TRADING_STRATEGY_API_URL)
-
     async def create_strategy(self, params: schemas.TradingStrategyRequest) -> schemas.TradingStrategyResponse:
         """
-        (Placeholder) Sends a request to create a new trading strategy.
+        Requests strategy creation from the trading-strategy-team API.
         """
-        response_data = await self.post(
+        response_data = await self._request(
+            method="POST",
             endpoint="/strategies",
             json=params.model_dump()
         )
         return schemas.TradingStrategyResponse(**response_data)
 
 
-trading_client = TradingClient() 
+trading_client = TradingClient(
+    service_name="Trading Strategy",
+    base_url=settings.TRADING_STRATEGY_API_BASE_URL
+) 
