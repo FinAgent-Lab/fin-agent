@@ -1,16 +1,16 @@
-from ..clients.trading_client import trading_client
-from ..clients.market_client import market_client
+from .market_analysis_service import MarketAnalysisService
+from .trading_service import TradingService
 from .. import schemas
 from typing import Any
 
-# Mapping from intent to the corresponding client and method
-INTENT_TO_CLIENT_MAP = {
+# Mapping from intent to the corresponding service and method
+INTENT_TO_SERVICE_MAP = {
     "market_analysis": {
-        "client": market_client,
-        "method": "get_analysis"
+        "service": MarketAnalysisService(),
+        "method": "analyze_market"
     },
     "strategy_creation": {
-        "client": trading_client,
+        "service": TradingService(),
         "method": "create_strategy"
     },
     # "backtest" and "strategy_execution" can be added later
@@ -19,38 +19,33 @@ INTENT_TO_CLIENT_MAP = {
 
 async def route_request(analysis: schemas.IntentAnalysisResult) -> Any:
     """
-    Routes the request to the appropriate backend client based on intent.
+    Routes the request to the appropriate backend service based on intent.
     """
     intent = analysis.intent
-    if intent not in INTENT_TO_CLIENT_MAP:
+    if intent not in INTENT_TO_SERVICE_MAP:
         return {"error": f"Intent '{intent}' is not supported."}
 
-    client_info = INTENT_TO_CLIENT_MAP[intent]
-    client = client_info["client"]
-    method_name = client_info["method"]
-    method_to_call = getattr(client, method_name)
+    service_info = INTENT_TO_SERVICE_MAP[intent]
+    service = service_info["service"]
+    method_name = service_info["method"]
+    method_to_call = getattr(service, method_name)
 
     # This is a simplified way to create request params from entities.
     # In a real scenario, this would be more robust.
     params_data = analysis.entities
     
-    # Here we would map entities to the correct Pydantic request model.
-    # For now, we'll assume the entities map directly.
+    # Here we would map entities to the appropriate service method.
     if intent == "market_analysis":
         symbol = params_data.get("stock_code")
         if not symbol:
             return {"error": "Stock symbol (stock_code) not found in the query."}
 
-        # Provide a default for the missing field
-        request_model = schemas.MarketAnalysisRequest(
-            symbol=symbol,
-            analysis_type=params_data.get("analysis_type", "technical")
-        )
+        analysis_type = params_data.get("analysis_type", "technical")
+        response = await method_to_call(symbol, analysis_type)
     elif intent == "strategy_creation":
-        request_model = schemas.TradingStrategyRequest(parameters=params_data)
+        response = await method_to_call(params_data)
     else:
         # Fallback for unhandled intents that are in the map
-        return {"error": f"Request model for intent '{intent}' not implemented."}
+        return {"error": f"Service method for intent '{intent}' not implemented."}
 
-    response = await method_to_call(request_model)
     return response 

@@ -1,17 +1,11 @@
-from fastapi import APIRouter, HTTPException
-from langgraph.prebuilt import create_react_agent
+from fastapi import APIRouter, HTTPException, Depends
 
 from src.meta_supervisor import schemas
 from src.meta_supervisor.services import nlu_service, routing_service
-from src.meta_supervisor.clients.market_client import MarketMCPClient
+from src.meta_supervisor.services.agent_service import AgentService
+from src.meta_supervisor.dependencies import get_agent_service
 
 router = APIRouter()
-
-market_client = MarketMCPClient()
-supervisor = create_react_agent(
-    model=llm,  # TODO: Add LLM
-    tools=await market_client.get_tools(), # TODO: 비동기 처리 필요
-)
 
 @router.post("/process", response_model=schemas.CommonResponse, tags=["Supervisor"])
 async def process_request(request: schemas.UserRequest):
@@ -36,12 +30,29 @@ async def process_request(request: schemas.UserRequest):
         ) 
 
 @router.post("/query", response_model=schemas.CommonResponse, tags=["Supervisor"])
-async def query(request: schemas.UserRequest):
+async def query(
+    request: schemas.UserRequest,
+    agent_service: AgentService = Depends(get_agent_service)
+):
     """
-    Queries the market analysis service.
+    Queries using the agent service with integrated tools and services.
     """
     try:
-        result = await market_client.get_analysis(request)
+        result = await agent_service.process_query(request.query)
+        return schemas.CommonResponse(data=result)
+    except Exception as e:
+        return schemas.CommonResponse(success=False, data=None, error_code="INTERNAL_SERVER_ERROR", error_message=str(e))
+
+@router.post("/agent", response_model=schemas.CommonResponse, tags=["Supervisor"])
+async def agent_query(
+    request: schemas.UserRequest,
+    agent_service: AgentService = Depends(get_agent_service)
+):
+    """
+    Direct agent query without intent analysis.
+    """
+    try:
+        result = await agent_service.query_with_agent(request.query)
         return schemas.CommonResponse(data=result)
     except Exception as e:
         return schemas.CommonResponse(success=False, data=None, error_code="INTERNAL_SERVER_ERROR", error_message=str(e))
