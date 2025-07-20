@@ -94,13 +94,36 @@ bash run.sh
 
 ## 6. API 사용 예시
 
-`curl`을 사용하여 `/api/process` 엔드포인트에 자연어 쿼리를 전송할 수 있습니다.
+### 6.1. 통합 쿼리 처리 엔드포인트
+
+`curl`을 사용하여 `/api/query` 엔드포인트에 자연어 쿼리를 전송할 수 있습니다.
 
 ```bash
-curl -X POST "http://localhost:8000/api/process" \
+curl -X POST "http://localhost:8000/api/query" \
 -H "Content-Type: application/json" \
 -d '{"query": "삼성전자 005930 주가 분석"}'
 ```
+
+### 6.2. 외부 API 연동
+
+#### 마켓 분석 API 연동 포맷
+
+**외부 마켓 분석 API 요청 포맷:**
+```python
+class QueryRequest(BaseModel):
+    query: str
+    model: Optional[str] = os.getenv("MAIN_LLM_MODEL", "gpt-4o-mini")
+    temperature: Optional[float] = 0.2
+```
+
+**외부 마켓 분석 API 응답 포맷:**
+```python
+class QueryResponse(BaseModel):
+    answer: str
+    timestamp: str
+```
+
+Meta Supervisor의 `MarketAnalysisService`가 위 포맷으로 외부 마켓 분석 API와 직접 통신합니다.
 
 #### 예상 응답 (백엔드 서버가 없을 경우)
 
@@ -120,3 +143,4 @@ curl -X POST "http://localhost:8000/api/process" \
 - 사용자 인증 및 세션 관리 기능 추가
 - 비즈니스 로직 및 워크플로우 고도화
 - 로깅 및 모니터링 시스템 구축
+- **fin-agent에서 사용자 요청에 담긴 스톡 넘버를 확인할 수 있는 기능 추가**

@@ -10,6 +10,7 @@ dependencies = [
     "konlpy>=0.6.0",
     "langchain>=0.3.26",
     "langchain-mcp-adapters>=0.1.9",
+    "langchain-openai>=0.3.28",
     "langgraph>=0.5.2",
     "pydantic-settings>=2.10.1",
     "python-dotenv>=1.1.1",
