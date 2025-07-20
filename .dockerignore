@@ -6,6 +6,7 @@
 .github/
 
 # Python cache and artifacts
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -40,6 +41,7 @@ coverage.xml
 .pytest_cache/
 
 # Environments
+# Virtual environments
 .env
 .venv
 env/
@@ -49,6 +51,7 @@ env.bak/
 venv.bak/
 
 # Development tools
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -58,6 +61,19 @@ venv.bak/
 # Documentation
 *.md
 docs/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
 
 # Logs
 *.log
@@ -83,3 +99,24 @@ yarn-error.log*
 # Backup files
 *.bak
 *.backup
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+docs/
+*.md
+README.md
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+
+# Temporary files
+*.tmp
+*.temp
