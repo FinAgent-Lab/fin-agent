@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  fin-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fin-agent-dev
+    restart: unless-stopped
+    ports:
+      - "${APISERVER_PORT_EXTERNAL:-8000}:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - MAIN_LLM_MODEL=${MAIN_LLM_MODEL:-gpt-4o-mini}
+      - PRODUCTION=${PRODUCTION:-false}
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    networks:
+      - finlab-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  finlab-net:
+    external: true
+
+volumes:
+  logs:
