@@ -18,7 +18,7 @@ class AgentService:
     ):
         self.market_service = market_service or MarketAnalysisService()
         # self.trading_service = trading_service or TradingService()  # 외부 API 미구현으로 주석처리
-        self.llm = llm or ChatOpenAI(model="gpt-4o")
+        self.llm = llm
         self._agent = None
     
     async def get_agent(self):

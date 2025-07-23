@@ -18,10 +18,12 @@ class MarketAnalysisTool(BaseAPITool):
     name: str = "market_analysis"
     description: str = "해당 주식에 대한 자세한 시장 분석 보고서를 생성합니다. Analyze stock market data for given symbols with technical or fundamental analysis and generate comprehensive market analysis reports"
     args_schema: type[BaseModel] = MarketAnalysisInput
+    service: MarketAnalysisService = Field(default=None, exclude=True)
     
     def __init__(self):
-        self.service = MarketAnalysisService()
-        super().__init__(client=self.service)
+        service = MarketAnalysisService()
+        super().__init__(client=service)
+        self.__dict__['service'] = service
     
     async def _arun(self, query: str) -> Dict[str, Any]:
         """
