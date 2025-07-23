@@ -9,9 +9,11 @@ class BaseAPITool(BaseTool, ABC):
     Base class for API-based tools in the meta-supervisor.
     """
     
-    def __init__(self, client, **kwargs):
+    client: Any = Field(default=None, exclude=True)
+    
+    def __init__(self, client=None, **kwargs):
         super().__init__(**kwargs)
-        self.client = client
+        self.__dict__['client'] = client
     
     @abstractmethod
     async def _arun(self, **kwargs) -> Any:
