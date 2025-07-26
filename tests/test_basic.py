@@ -98,14 +98,15 @@ class TestConfiguration:
     
     def test_environment_variables(self):
         """Test that required environment variables are handled correctly."""
-        # Test that the app can handle missing environment variables gracefully
-        with patch.dict(os.environ, {}, clear=True):
-            try:
-                from meta_supervisor.config import settings
-                # Should not fail, might use defaults
-                assert settings is not None
-            except Exception as e:
-                pytest.fail(f"Configuration failed with missing env vars: {e}")
+        # Test that config loads without errors (using session-level env vars)
+        try:
+            from meta_supervisor.config import settings
+            assert settings is not None
+            assert settings.OPENAI_API_KEY is not None
+            assert len(settings.OPENAI_API_KEY) > 0
+            assert "http" in settings.MARKET_ANALYSIS_API_BASE_URL
+        except Exception as e:
+            pytest.fail(f"Configuration failed with test env vars: {e}")
     
     def test_default_model_setting(self):
         """Test default LLM model setting."""
