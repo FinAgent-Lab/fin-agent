@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 
 class BaseAPITool(BaseTool, ABC):

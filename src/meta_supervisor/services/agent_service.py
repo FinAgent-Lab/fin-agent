@@ -6,7 +6,6 @@ from .market_analysis_service import MarketAnalysisService
 # from .trading_service import TradingService  # 외부 API 미구현으로 주석처리
 # from .nlu_service import analyze  # 외부 기능 미구현으로 주석처리
 from ..tools import MarketAnalysisTool  # , TradingTool  # TradingTool 주석처리
-from .. import schemas
 
 
 class AgentService:
