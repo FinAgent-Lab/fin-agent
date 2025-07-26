@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 
 from src.meta_supervisor import schemas
 from src.meta_supervisor.services import nlu_service, routing_service

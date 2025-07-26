@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 
-from .config import settings
 from .routers import api
 
 app = FastAPI(
@@ -29,7 +28,6 @@ async def health_check():
     """
     Comprehensive health check endpoint for monitoring and Docker health checks.
     """
-    import asyncio
     from datetime import datetime
     import os
     
@@ -59,7 +57,7 @@ async def health_check():
     # Basic service availability check
     try:
         from .services.market_analysis_service import MarketAnalysisService
-        service = MarketAnalysisService()
+        MarketAnalysisService()  # Verify instantiation is possible
         health_data["checks"]["market_analysis_service"] = {"status": "healthy", "available": True}
     except Exception as e:
         health_data["checks"]["market_analysis_service"] = {"status": "error", "error": str(e)}
