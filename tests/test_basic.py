@@ -8,44 +8,49 @@ are working correctly and can be imported without errors.
 import pytest
 import sys
 import os
-from unittest.mock import patch
 
 # Add src to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src"))
 
 
 class TestApplicationImports:
     """Test that core application modules can be imported successfully."""
-    
+
     def test_main_app_import(self):
         """Test that the main FastAPI application can be imported."""
         try:
             from meta_supervisor.main import app
+
             assert app is not None
-            assert hasattr(app, 'title')
+            assert hasattr(app, "title")
         except ImportError as e:
             pytest.fail(f"Failed to import main app: {e}")
-    
+
     def test_config_import(self):
         """Test that configuration module can be imported."""
         try:
             from meta_supervisor.config import settings
+
             assert settings is not None
         except ImportError as e:
             pytest.fail(f"Failed to import config: {e}")
-    
+
     def test_services_import(self):
         """Test that service modules can be imported."""
         try:
-            from meta_supervisor.services.market_analysis_service import MarketAnalysisService
+            from meta_supervisor.services.market_analysis_service import (
+                MarketAnalysisService,
+            )
+
             assert MarketAnalysisService is not None
         except ImportError as e:
             pytest.fail(f"Failed to import MarketAnalysisService: {e}")
-    
+
     def test_routers_import(self):
         """Test that router modules can be imported."""
         try:
             from meta_supervisor.routers.api import router
+
             assert router is not None
         except ImportError as e:
             pytest.fail(f"Failed to import API router: {e}")
@@ -53,65 +58,69 @@ class TestApplicationImports:
 
 class TestMarketAnalysisService:
     """Test the MarketAnalysisService functionality."""
-    
+
     @pytest.fixture
     def market_service(self):
         """Create a MarketAnalysisService instance for testing."""
-        from meta_supervisor.services.market_analysis_service import MarketAnalysisService
+        from meta_supervisor.services.market_analysis_service import (
+            MarketAnalysisService,
+        )
+
         return MarketAnalysisService()
-    
+
     def test_service_initialization(self, market_service):
         """Test that MarketAnalysisService initializes correctly."""
         assert market_service is not None
-        assert hasattr(market_service, 'base_url')
-        assert hasattr(market_service, 'analyze_market')
-    
+        assert hasattr(market_service, "base_url")
+        assert hasattr(market_service, "analyze_market")
+
     @pytest.mark.asyncio
     async def test_fallback_analysis(self, market_service):
         """Test the fallback analysis functionality."""
         # Test with a known stock
         result = await market_service._get_fallback_analysis("테슬라 분석")
-        
+
         assert result is not None
-        assert 'query' in result
-        assert 'answer' in result
-        assert 'timestamp' in result
-        assert 'source' in result
-        assert result['source'] == 'fallback_analysis'
-        assert result['query'] == "테슬라 분석"
-        assert "테슬라" in result['answer']
-    
+        assert "query" in result
+        assert "answer" in result
+        assert "timestamp" in result
+        assert "source" in result
+        assert result["source"] == "fallback_analysis"
+        assert result["query"] == "테슬라 분석"
+        assert "테슬라" in result["answer"]
+
     @pytest.mark.asyncio
     async def test_fallback_analysis_unknown_stock(self, market_service):
         """Test fallback analysis with unknown stock."""
         result = await market_service._get_fallback_analysis("일반적인 시장 분석")
-        
+
         assert result is not None
-        assert 'query' in result
-        assert 'answer' in result
-        assert result['source'] == 'fallback_analysis'
-        assert "시장 분석 결과" in result['answer']
+        assert "query" in result
+        assert "answer" in result
+        assert result["source"] == "fallback_analysis"
+        assert "시장 분석 결과" in result["answer"]
 
 
 class TestConfiguration:
     """Test application configuration."""
-    
+
     def test_environment_variables(self):
         """Test that required environment variables are handled correctly."""
         # Test that config loads without errors (using session-level env vars)
         try:
             from meta_supervisor.config import settings
+
             assert settings is not None
             assert settings.OPENAI_API_KEY is not None
             assert len(settings.OPENAI_API_KEY) > 0
             assert "http" in settings.MARKET_ANALYSIS_API_BASE_URL
         except Exception as e:
             pytest.fail(f"Configuration failed with test env vars: {e}")
-    
+
     def test_default_model_setting(self):
         """Test default LLM model setting."""
         from meta_supervisor.services.market_analysis_service import QueryRequest
-        
+
         request = QueryRequest(query="test query")
         # Should have a default model
         assert request.model is not None
@@ -120,42 +129,46 @@ class TestConfiguration:
 
 class TestApplicationHealth:
     """Test basic application health and functionality."""
-    
+
     def test_python_version_compatibility(self):
         """Test that we're running on a supported Python version."""
         version = sys.version_info
         assert version.major == 3
-        assert version.minor >= 10, f"Python 3.10+ required, got {version.major}.{version.minor}"
-    
+        assert version.minor >= 10, (
+            f"Python 3.10+ required, got {version.major}.{version.minor}"
+        )
+
     def test_required_packages_available(self):
         """Test that required packages are available."""
         required_packages = [
-            'fastapi',
-            'httpx',
-            'pydantic',
-            'uvicorn',
-            'langchain',
-            'langgraph'
+            "fastapi",
+            "httpx",
+            "pydantic",
+            "uvicorn",
+            "langchain",
+            "langgraph",
         ]
-        
+
         for package in required_packages:
             try:
                 __import__(package)
             except ImportError:
                 pytest.fail(f"Required package '{package}' is not available")
-    
+
     @pytest.mark.asyncio
     async def test_basic_service_functionality(self):
         """Test that services can perform basic operations."""
-        from meta_supervisor.services.market_analysis_service import MarketAnalysisService
-        
+        from meta_supervisor.services.market_analysis_service import (
+            MarketAnalysisService,
+        )
+
         service = MarketAnalysisService()
-        
+
         # Test that fallback analysis works
         result = await service._get_fallback_analysis("test query")
         assert result is not None
         assert isinstance(result, dict)
-        assert 'answer' in result
+        assert "answer" in result
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ from src.meta_supervisor.dependencies import get_agent_service
 
 router = APIRouter()
 
+
 @router.post("/process", response_model=schemas.CommonResponse, tags=["Supervisor"])
 async def process_request(request: schemas.UserRequest):
     """
@@ -26,13 +27,14 @@ async def process_request(request: schemas.UserRequest):
             success=False,
             data=None,
             error_code="INTERNAL_SERVER_ERROR",
-            error_message=str(e)
-        ) 
+            error_message=str(e),
+        )
+
 
 @router.post("/query", response_model=schemas.CommonResponse, tags=["Supervisor"])
 async def query(
     request: schemas.UserRequest,
-    agent_service: AgentService = Depends(get_agent_service)
+    agent_service: AgentService = Depends(get_agent_service),
 ):
     """
     Queries using the agent service with integrated tools and services.
@@ -41,12 +43,18 @@ async def query(
         result = await agent_service.process_query(request.query)
         return schemas.CommonResponse(data=result)
     except Exception as e:
-        return schemas.CommonResponse(success=False, data=None, error_code="INTERNAL_SERVER_ERROR", error_message=str(e))
+        return schemas.CommonResponse(
+            success=False,
+            data=None,
+            error_code="INTERNAL_SERVER_ERROR",
+            error_message=str(e),
+        )
+
 
 @router.post("/agent", response_model=schemas.CommonResponse, tags=["Supervisor"])
 async def agent_query(
     request: schemas.UserRequest,
-    agent_service: AgentService = Depends(get_agent_service)
+    agent_service: AgentService = Depends(get_agent_service),
 ):
     """
     Direct agent query without intent analysis.
@@ -55,4 +63,9 @@ async def agent_query(
         result = await agent_service.query_with_agent(request.query)
         return schemas.CommonResponse(data=result)
     except Exception as e:
-        return schemas.CommonResponse(success=False, data=None, error_code="INTERNAL_SERVER_ERROR", error_message=str(e))
+        return schemas.CommonResponse(
+            success=False,
+            data=None,
+            error_code="INTERNAL_SERVER_ERROR",
+            error_message=str(e),
+        )

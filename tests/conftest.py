@@ -15,9 +15,9 @@ def setup_test_environment():
         "MARKET_ANALYSIS_API_BASE_URL": "http://localhost:8001/test",
         "TRADING_STRATEGY_API_BASE_URL": "http://localhost:8002/test",
         "MAIN_LLM_MODEL": "gpt-4o-mini",
-        "ENVIRONMENT": "testing"
+        "ENVIRONMENT": "testing",
     }
-    
+
     with patch.dict(os.environ, test_env, clear=False):
         yield
 
@@ -28,8 +28,8 @@ def mock_environment():
     test_env = {
         "OPENAI_API_KEY": "test-key",
         "MARKET_ANALYSIS_API_BASE_URL": "http://test-market-api",
-        "TRADING_STRATEGY_API_BASE_URL": "http://test-trading-api"
+        "TRADING_STRATEGY_API_BASE_URL": "http://test-trading-api",
     }
-    
+
     with patch.dict(os.environ, test_env, clear=False):
         yield test_env

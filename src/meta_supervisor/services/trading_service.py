@@ -7,7 +7,7 @@ from ..config import settings
 class TradingService:
     def __init__(self):
         self.base_url = settings.TRADING_STRATEGY_API_BASE_URL
-    
+
     async def _request(
         self,
         method: str,
@@ -30,32 +30,32 @@ class TradingService:
             raise Exception(
                 f"Trading Strategy API returned error: {e.response.status_code} {e.response.text}"
             )
-    
-    async def create_strategy(self, parameters: Dict[str, Any]) -> schemas.TradingStrategyResponse:
+
+    async def create_strategy(
+        self, parameters: Dict[str, Any]
+    ) -> schemas.TradingStrategyResponse:
         request = schemas.TradingStrategyRequest(parameters=parameters)
         response_data = await self._request(
-            method="POST",
-            endpoint="/strategies",
-            json=request.model_dump()
+            method="POST", endpoint="/strategies", json=request.model_dump()
         )
         return schemas.TradingStrategyResponse(**response_data)
-    
-    async def execute_trade(self, symbol: str, action: str, quantity: int, price: float = None) -> schemas.TradingStrategyResponse:
-        trade_params = {
-            "symbol": symbol,
-            "action": action,
-            "quantity": quantity
-        }
+
+    async def execute_trade(
+        self, symbol: str, action: str, quantity: int, price: float = None
+    ) -> schemas.TradingStrategyResponse:
+        trade_params = {"symbol": symbol, "action": action, "quantity": quantity}
         if price:
             trade_params["price"] = price
-            
+
         return await self.create_strategy(trade_params)
-    
+
     async def get_portfolio(self) -> schemas.TradingStrategyResponse:
         portfolio_params = {"action": "get_portfolio"}
         return await self.create_strategy(portfolio_params)
-    
-    async def get_positions(self, symbol: str = None) -> schemas.TradingStrategyResponse:
+
+    async def get_positions(
+        self, symbol: str = None
+    ) -> schemas.TradingStrategyResponse:
         position_params = {"action": "get_positions"}
         if symbol:
             position_params["symbol"] = symbol
