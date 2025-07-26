@@ -1,0 +1,71 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: '배포 환경 선택'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy:
+    name: Deploy to Production Environment
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Run tests
+        run: uv run pytest tests/
+      
+      - name: Build Docker image
+        run: |
+          docker build -t fin-agent:prod .
+      
+      - name: Set up environment variables
+        run: |
+          cat > .env << EOF
+          PRODUCTION=true
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL=${{ vars.OPENAI_BASE_URL }}
+          MAIN_LLM_MODEL=${{ vars.MAIN_LLM_MODEL }}
+          EOF
+      
+      - name: Deploy to production
+        run: |
+          docker-compose down || true
+          docker-compose up -d
+        env:
+          PRODUCTION: true
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
+          MAIN_LLM_MODEL: ${{ vars.MAIN_LLM_MODEL }}
+      
+      - name: Health check
+        run: |
+          sleep 15
+          curl -f http://localhost:8000/health || exit 1
+      
+      - name: Clean up old images
+        run: |
+          docker image prune -f

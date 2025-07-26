@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  backend-ma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: finagent-meta-supervisor
+    ports:
+      - "${APISERVER_PORT_EXTERNAL:-8000}:8000"
+    environment:
+      # Core Configuration
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - HOST=0.0.0.0
+      - PORT=8000
+      
+      # API Configuration
+      - TRADING_STRATEGY_API_BASE_URL=${TRADING_STRATEGY_API_BASE_URL:-http://trading-strategy-team/api/v1}
+      - MARKET_ANALYSIS_API_BASE_URL=${MARKET_ANALYSIS_API_BASE_URL:-http://market-analysis-team/api/v1}
+      
+      # LLM Configuration
+      - MAIN_LLM_MODEL=${MAIN_LLM_MODEL:-gpt-4o-mini}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+    
+    volumes:
+      - ./logs:/app/logs
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: finagent-network
