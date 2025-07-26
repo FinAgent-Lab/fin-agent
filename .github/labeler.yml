@@ -1,74 +1,99 @@
 # Auto-labeling configuration for FinAgent Meta-Supervisor
-# GitHub Actions labeler will automatically apply labels based on file paths
+# GitHub Actions labeler v5 format
 
 # Component-based labels
-"meta-supervisor":
-  - "src/meta_supervisor/**"
-  - "src/meta_supervisor/**/*"
+meta-supervisor:
+- changed-files:
+    any-glob-to-any-file: 
+      - 'src/meta_supervisor/**'
 
-"services":
-  - "src/meta_supervisor/services/**"
-  - "src/meta_supervisor/services/**/*"
+services:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/**'
 
-"api":
-  - "src/meta_supervisor/routers/**"
-  - "src/meta_supervisor/routers/**/*"
+api:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/routers/**'
 
-"config":
-  - "src/meta_supervisor/config.py"
-  - "src/meta_supervisor/config/**"
+config:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/config.py'
+      - 'src/meta_supervisor/config/**'
 
 # Feature-specific labels
-"market-analysis":
-  - "src/meta_supervisor/services/market_analysis_service.py"
-  - "**/market_analysis*"
+market-analysis:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/market_analysis_service.py'
+      - '**/market_analysis*'
 
-"trading":
-  - "src/meta_supervisor/services/trading_service.py"
-  - "**/trading*"
+trading:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/trading_service.py'
+      - '**/trading*'
 
-"routing":
-  - "src/meta_supervisor/services/routing_service.py"
-  - "**/routing*"
+routing:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/routing_service.py'
+      - '**/routing*'
 
-"nlu":
-  - "src/meta_supervisor/services/nlu_service.py"
-  - "**/nlu*"
+nlu:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/nlu_service.py'
+      - '**/nlu*'
 
 # Infrastructure labels
-"tests":
-  - "tests/**"
-  - "tests/**/*"
-  - "**/test_*"
-  - "**/*_test.py"
+tests:
+- changed-files:
+    any-glob-to-any-file:
+      - 'tests/**'
+      - '**/test_*'
+      - '**/*_test.py'
 
-"ci/cd":
-  - ".github/**"
-  - ".github/**/*"
-  - "**/*.yml"
-  - "**/*.yaml"
+ci-cd:
+- changed-files:
+    any-glob-to-any-file:
+      - '.github/**'
+      - '**/*.yml'
+      - '**/*.yaml'
 
-"docker":
-  - "Dockerfile*"
-  - "docker-compose*"
-  - ".dockerignore"
+docker:
+- changed-files:
+    any-glob-to-any-file:
+      - 'Dockerfile*'
+      - 'docker-compose*'
+      - '.dockerignore'
 
-"dependencies":
-  - "pyproject.toml"
-  - "requirements*.txt"
-  - "uv.lock"
+dependencies:
+- changed-files:
+    any-glob-to-any-file:
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'uv.lock'
 
-"documentation":
-  - "README*"
-  - "docs/**"
-  - "**/*.md"
+documentation:
+- changed-files:
+    any-glob-to-any-file:
+      - 'README*'
+      - 'docs/**'
+      - '**/*.md'
 
 # Development workflow labels
-"enhancement":
-  - "src/**/*.py"
+enhancement:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/**/*.py'
 
-"configuration":
-  - "*.toml"
-  - "*.ini" 
-  - "*.conf"
-  - ".env*"
+configuration:
+- changed-files:
+    any-glob-to-any-file:
+      - '*.toml'
+      - '*.ini'
+      - '*.conf'
+      - '.env*'
