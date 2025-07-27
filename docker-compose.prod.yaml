@@ -44,5 +44,5 @@ services:
         max-file: "3"
 
 networks:
-  default:
-    name: finagent-network
+  finlab-net:
+    external: true
