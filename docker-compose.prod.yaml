@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  backend-ma:
+  meta-supervisor:
     build:
       context: .
       dockerfile: Dockerfile
