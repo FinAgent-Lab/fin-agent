@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     name: Deploy to Finlab-1
-    runs-on: finlab-1
+    runs-on: finlab-01
     
     steps:
       - name: Update permissions
