@@ -34,7 +34,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Create app user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+# RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN useradd --create-home --shell /bin/bash appuser
 
 # Set working directory
 WORKDIR /app
@@ -49,6 +50,7 @@ COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy application code
+
 COPY --chown=appuser:appuser src/ ./src/
 COPY --chown=appuser:appuser pyproject.toml ./
 COPY --chown=appuser:appuser .env.template ./.env
