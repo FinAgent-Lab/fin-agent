@@ -46,7 +46,7 @@ jobs:
 
           cat > .env << EOF
           ENVIRONMENT=production
-          APISERVER_PORT_EXTERNAL=8000
+          APISERVER_PORT_EXTERNAL=8001
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL=${{ vars.OPENAI_BASE_URL || 'https://api.openai.com/v1' }}
           MAIN_LLM_MODEL=${{ vars.MAIN_LLM_MODEL || 'gpt-4o-mini' }}
