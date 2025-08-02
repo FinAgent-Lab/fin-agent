@@ -1,0 +1,99 @@
+# Auto-labeling configuration for FinAgent Meta-Supervisor
+# GitHub Actions labeler v5 format
+
+# Component-based labels
+meta-supervisor:
+- changed-files:
+    any-glob-to-any-file: 
+      - 'src/meta_supervisor/**'
+
+services:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/**'
+
+api:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/routers/**'
+
+config:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/config.py'
+      - 'src/meta_supervisor/config/**'
+
+# Feature-specific labels
+market-analysis:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/market_analysis_service.py'
+      - '**/market_analysis*'
+
+trading:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/trading_service.py'
+      - '**/trading*'
+
+routing:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/routing_service.py'
+      - '**/routing*'
+
+nlu:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/meta_supervisor/services/nlu_service.py'
+      - '**/nlu*'
+
+# Infrastructure labels
+tests:
+- changed-files:
+    any-glob-to-any-file:
+      - 'tests/**'
+      - '**/test_*'
+      - '**/*_test.py'
+
+ci-cd:
+- changed-files:
+    any-glob-to-any-file:
+      - '.github/**'
+      - '**/*.yml'
+      - '**/*.yaml'
+
+docker:
+- changed-files:
+    any-glob-to-any-file:
+      - 'Dockerfile*'
+      - 'docker-compose*'
+      - '.dockerignore'
+
+dependencies:
+- changed-files:
+    any-glob-to-any-file:
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'uv.lock'
+
+documentation:
+- changed-files:
+    any-glob-to-any-file:
+      - 'README*'
+      - 'docs/**'
+      - '**/*.md'
+
+# Development workflow labels
+enhancement:
+- changed-files:
+    any-glob-to-any-file:
+      - 'src/**/*.py'
+
+configuration:
+- changed-files:
+    any-glob-to-any-file:
+      - '*.toml'
+      - '*.ini'
+      - '*.conf'
+      - '.env*'

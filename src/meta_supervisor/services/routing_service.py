@@ -5,14 +5,8 @@ from typing import Any
 
 # Mapping from intent to the corresponding service and method
 INTENT_TO_SERVICE_MAP = {
-    "market_analysis": {
-        "service": MarketAnalysisService(),
-        "method": "analyze_market"
-    },
-    "strategy_creation": {
-        "service": TradingService(),
-        "method": "create_strategy"
-    },
+    "market_analysis": {"service": MarketAnalysisService(), "method": "analyze_market"},
+    "strategy_creation": {"service": TradingService(), "method": "create_strategy"},
     # "backtest" and "strategy_execution" can be added later
 }
 
@@ -33,7 +27,7 @@ async def route_request(analysis: schemas.IntentAnalysisResult) -> Any:
     # This is a simplified way to create request params from entities.
     # In a real scenario, this would be more robust.
     params_data = analysis.entities
-    
+
     # Here we would map entities to the appropriate service method.
     if intent == "market_analysis":
         symbol = params_data.get("stock_code")
@@ -48,4 +42,4 @@ async def route_request(analysis: schemas.IntentAnalysisResult) -> Any:
         # Fallback for unhandled intents that are in the map
         return {"error": f"Service method for intent '{intent}' not implemented."}
 
-    return response 
+    return response
