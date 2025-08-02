@@ -11,9 +11,9 @@ jobs:
     runs-on: finlab-01
     
     steps:
-      - name: Update permissions
-        run: |
-          sudo chmod -R 777 /opt/actions-runner/_work
+      # - name: Update permissions
+      #   run: |
+      #     sudo chmod -R 777 /opt/actions-runner/_work
 
       - name: Checkout code
         uses: actions/checkout@v4
