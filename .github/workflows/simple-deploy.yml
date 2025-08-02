@@ -54,10 +54,10 @@ jobs:
           MARKET_ANALYSIS_API_BASE_URL=${{ vars.MARKET_ANALYSIS_API_BASE_URL || 'http://market-analysis-team/api/v1' }}
           EOF
       
-      - name: Clean Docker build cache
-        run: |
-          echo "=== Docker 빌드 캐시 정리 ==="
-          docker builder prune -af
+      # - name: Clean Docker build cache
+      #   run: |
+      #     echo "=== Docker 빌드 캐시 정리 ==="
+      #     docker builder prune -af
           
       - name: Build and tag Docker images
         run: |
