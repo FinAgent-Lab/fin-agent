@@ -90,7 +90,7 @@ jobs:
           sleep 10  # 서비스 초기화 대기
           
           for i in {1..5}; do
-            if curl -f -s http://localhost:8000/health > /dev/null; then
+            if curl -f -s http://localhost:8001/health > /dev/null; then
               echo "✅ 헬스체크 성공"
               break
             elif [ $i -eq 5 ]; then
@@ -115,4 +115,4 @@ jobs:
           docker compose -f docker-compose.prod.yaml logs --tail=20
           
           echo "=== 서비스 응답 테스트 ==="
-          curl -s http://localhost:8000/ || echo "Root endpoint 응답 없음"
+          curl -s http://localhost:8001/ || echo "Root endpoint 응답 없음"
