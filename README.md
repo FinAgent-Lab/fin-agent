@@ -136,10 +136,87 @@ Meta Supervisor의 `MarketAnalysisService`가 위 포맷으로 외부 마켓 분
 }
 ```
 
-## 7. 향후 계획
+## 7. 배포
+
+### 7.1. Docker를 이용한 배포
+
+프로젝트는 Docker를 사용하여 컨테이너화되어 있습니다.
+
+#### 환경 변수 설정
+
+배포 전에 다음 환경 변수들을 설정해야 합니다:
+
+```bash
+# 필수 환경 변수
+OPENAI_API_KEY=your_openai_api_key
+
+# 선택적 환경 변수 (기본값 사용 가능)
+ENVIRONMENT=production
+TRADING_STRATEGY_API_BASE_URL=http://trading-strategy-team/api/v1
+MARKET_ANALYSIS_API_BASE_URL=http://market-analysis-team/api/v1
+MAIN_LLM_MODEL=gpt-4o-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
+```
+
+#### Docker Compose를 이용한 배포
+
+```bash
+# 환경 변수 파일 생성
+cat > .env << EOF
+ENVIRONMENT=production
+APISERVER_PORT_EXTERNAL=8000
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_BASE_URL=https://api.openai.com/v1
+MAIN_LLM_MODEL=gpt-4o-mini
+TRADING_STRATEGY_API_BASE_URL=http://trading-strategy-team/api/v1
+MARKET_ANALYSIS_API_BASE_URL=http://market-analysis-team/api/v1
+EOF
+
+# 서비스 빌드 및 시작
+docker compose -f docker-compose.prod.yaml up -d
+
+# 서비스 상태 확인
+docker compose -f docker-compose.prod.yaml ps
+
+# 로그 확인
+docker compose -f docker-compose.prod.yaml logs -f
+```
+
+#### 헬스체크
+
+서비스가 정상적으로 실행되고 있는지 확인:
+
+```bash
+curl http://localhost:8000/health
+```
+
+### 7.2. GitHub Actions를 이용한 자동 배포
+
+프로젝트는 GitHub Actions를 통한 자동 배포를 지원합니다.
+
+#### GitHub Secrets 설정
+
+다음 Secrets를 GitHub 저장소에 설정해주세요:
+
+- `OPENAI_API_KEY`: OpenAI API 키 (필수)
+
+#### GitHub Variables 설정 (선택사항)
+
+다음 Variables를 설정할 수 있습니다:
+
+- `OPENAI_BASE_URL`: OpenAI API 기본 URL (기본값: https://api.openai.com/v1)
+- `MAIN_LLM_MODEL`: 사용할 LLM 모델 (기본값: gpt-4o-mini)
+- `TRADING_STRATEGY_API_BASE_URL`: 트레이딩 전략 API URL
+- `MARKET_ANALYSIS_API_BASE_URL`: 시장 분석 API URL
+
+#### 배포 트리거
+
+- `main`, `develop`, `dev` 브랜치에 푸시하거나
+- GitHub Actions 페이지에서 수동으로 "Simple Deploy to Self-Hosted Runner" 워크플로우 실행
+
+## 8. 향후 계획
 
 - 실제 백엔드 API 명세에 맞춰 `clients` 모듈의 요청/응답 로직 구체화
-- Docker 환경 구성으로 개발 및 배포 환경 통일
 - 사용자 인증 및 세션 관리 기능 추가
 - 비즈니스 로직 및 워크플로우 고도화
 - 로깅 및 모니터링 시스템 구축

@@ -1,0 +1,118 @@
+name: Simple Deploy to Self-Hosted Runner
+
+on:
+  push:
+    branches: [ main, develop, dev, feat/6 ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Finlab-1
+    runs-on: finlab-01
+    
+    steps:
+      # - name: Update permissions
+      #   run: |
+      #     sudo chmod -R 777 /opt/actions-runner/_work
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Install required tools
+        run: |
+          # jq와 curl이 설치되어 있는지 확인하고 없으면 설치
+          if ! command -v jq &> /dev/null; then
+            echo "jq가 설치되어 있지 않습니다. 설치 중..."
+            sudo dnf install -y jq || sudo yum install -y jq
+          fi
+          
+          if ! command -v curl &> /dev/null; then
+            echo "curl이 설치되어 있지 않습니다. 설치 중..."
+            sudo dnf install -y curl || sudo yum install -y curl
+          fi
+          
+          echo "필요한 도구들이 설치되었습니다."
+          jq --version
+          curl --version
+      
+      - name: Set up environment variables
+        run: |
+          CURRENT_UID=$(id -u)
+          CURRENT_GID=$(id -g)
+          USER_NAME=$(whoami)
+          echo "USER_NAME: $USER_NAME"
+
+          cat > .env << EOF
+          ENVIRONMENT=production
+          APISERVER_PORT_EXTERNAL=8001
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL=${{ vars.OPENAI_BASE_URL || 'https://api.openai.com/v1' }}
+          MAIN_LLM_MODEL=${{ vars.MAIN_LLM_MODEL || 'gpt-4o-mini' }}
+          TRADING_STRATEGY_API_BASE_URL=${{ vars.TRADING_STRATEGY_API_BASE_URL || 'http://trading-strategy-team/api/v1' }}
+          MARKET_ANALYSIS_API_BASE_URL=${{ vars.MARKET_ANALYSIS_API_BASE_URL || 'http://market-analysis-team/api/v1' }}
+          EOF
+      
+      - name: Clean Docker build cache
+        run: |
+          echo "=== Docker 빌드 캐시 정리 ==="
+          docker builder prune -af
+          
+      - name: Build and tag Docker images
+        run: |
+          # 캐시 없이 빌드 (--no-cache 옵션)
+          docker compose -f docker-compose.prod.yaml build --no-cache meta-supervisor
+      
+      - name: Stop running containers
+        run: |
+          docker compose -f docker-compose.prod.yaml down || true
+      
+      - name: Start Docker Compose services
+        run: |
+          docker compose -f docker-compose.prod.yaml up -d --remove-orphans
+      
+      - name: Check service availability 
+        run: |
+          echo "=== 서비스 가용성 확인 ==="
+          
+          # netcat을 사용한 포트 체크 (더 안정적)
+          timeout 60 bash -c '
+            until nc -z localhost 8000; do
+              echo "포트 8000 연결 대기 중..."
+              sleep 2
+            done
+          '
+          echo "✅ 포트 8000에 연결 가능합니다."
+          
+          # 헬스체크 확인 (추가)
+          echo "=== 헬스체크 확인 ==="
+          sleep 10  # 서비스 초기화 대기
+          
+          for i in {1..5}; do
+            if curl -f -s http://localhost:8001/health > /dev/null; then
+              echo "✅ 헬스체크 성공"
+              break
+            elif [ $i -eq 5 ]; then
+              echo "❌ 헬스체크 실패 - 하지만 포트는 열려있음"
+            else
+              echo "헬스체크 재시도 중... ($i/5)"
+              sleep 5
+            fi
+          done
+      
+      - name: Clean up old images
+        run: |
+          # 사용하지 않는 이미지 정리
+          docker image prune -af --filter "until=24h" || true
+          
+      - name: Show deployment status
+        run: |
+          echo "=== 배포 상태 확인 ==="
+          docker compose -f docker-compose.prod.yaml ps
+          
+          echo "=== 컨테이너 로그 (마지막 20줄) ==="
+          docker compose -f docker-compose.prod.yaml logs --tail=20
+          
+          echo "=== 서비스 응답 테스트 ==="
+          curl -s http://localhost:8001/ || echo "Root endpoint 응답 없음"
