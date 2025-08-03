@@ -35,10 +35,11 @@ RUN apt-get update && apt-get install -y \
 
 # Create app user for security
 # RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN useradd --create-home --shell /bin/bash appuser && chown appuser:appuser /app
-
+RUN useradd --create-home --shell /bin/bash appuser 
 # Set working directory
 WORKDIR /app
+
+RUN chown appuser:appuser /app
 
 # Copy uv from builder stage
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
