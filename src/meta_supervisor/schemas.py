@@ -3,6 +3,8 @@ from typing import Optional, Dict, Any, TypeVar, Generic
 
 T = TypeVar("T")
 
+class ResponseBody(BaseModel):
+    answer: str
 
 class CommonResponse(BaseModel, Generic[T]):
     """
