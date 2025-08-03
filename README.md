@@ -1,4 +1,5 @@
 # Meta Supervisor
+[![Deployed](https://github.com/FinAgent-Lab/fin-agent/actions/workflows/simple-deploy.yml/badge.svg)](https://github.com/FinAgent-Lab/fin-agent/actions/workflows/simple-deploy.yml)
 
 ## 1. 프로젝트 소개
 
