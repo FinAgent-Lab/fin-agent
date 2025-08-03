@@ -31,7 +31,7 @@ async def process_request(request: schemas.UserRequest):
         )
 
 
-@router.post("/query", response_model=schemas.CommonResponse, tags=["Supervisor"])
+@router.post("/query", response_model=schemas.ResponseBody, tags=["Supervisor"])
 async def query(
     request: schemas.UserRequest,
     agent_service: AgentService = Depends(get_agent_service),
@@ -41,13 +41,11 @@ async def query(
     """
     try:
         result = await agent_service.process_query(request.query)
-        return schemas.CommonResponse(data=result)
+        # return schemas.CommonResponse(data=result)
+        return schemas.ResponseBody(answer=result["result"])
     except Exception as e:
-        return schemas.CommonResponse(
-            success=False,
-            data=None,
-            error_code="INTERNAL_SERVER_ERROR",
-            error_message=str(e),
+        return schemas.ResponseBody(
+            answer=str(e),
         )
 
 
