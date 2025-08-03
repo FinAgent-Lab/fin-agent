@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y \
 
 # Create app user for security
 # RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN useradd --create-home --shell /bin/bash appuser
+RUN useradd --create-home --shell /bin/bash appuser && chown appuser:appuser /app
 
 # Set working directory
 WORKDIR /app
