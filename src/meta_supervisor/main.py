@@ -1,12 +1,16 @@
 from fastapi import FastAPI
 
 from .routers import api
+from .simple_logging import SimpleLoggingMiddleware
 
 app = FastAPI(
     title="Meta Supervisor",
     description="Orchestration agent for Fin-Agent services.",
     version="0.1.0",
 )
+
+# Add simple HTTP logging middleware
+app.add_middleware(SimpleLoggingMiddleware)
 
 app.include_router(api.router, prefix="/api")
 
@@ -24,12 +28,12 @@ async def health_check():
     """
     Comprehensive health check endpoint for monitoring and Docker health checks.
     """
-    from datetime import datetime
+    from datetime import datetime, timezone
     import os
 
     health_data = {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
         "service": "Meta Supervisor",
         "version": "0.1.0",
         "environment": os.getenv("ENVIRONMENT", "development"),
