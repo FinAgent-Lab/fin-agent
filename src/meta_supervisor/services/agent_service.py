@@ -5,7 +5,6 @@ from langchain_openai import ChatOpenAI
 from .market_analysis_service import MarketAnalysisService
 
 # from .trading_service import TradingService  # 외부 API 미구현으로 주석처리
-# from .nlu_service import analyze  # 외부 기능 미구현으로 주석처리
 from ..tools import MarketAnalysisTool  # , TradingTool  # TradingTool 주석처리
 
 
@@ -27,39 +26,51 @@ class AgentService:
                 MarketAnalysisTool(),
                 # TradingTool()  # 외부 API 미구현으로 주석처리
             ]
+            
+            system_prompt = """You are a professional financial analysis assistant specializing in stock market analysis and investment research.
+
+**Your Role:**
+- Provide accurate, data-driven financial analysis and market insights
+- Use available tools to gather real-time market information when needed
+- Explain complex financial concepts in clear, accessible language
+- Support both Korean and English queries with appropriate responses
+
+**Tool Usage Guidelines:**
+- Use the market_analysis tool for specific stock analysis, market trends, and technical/fundamental analysis
+- Always verify stock symbols/codes before making analysis requests
+- Provide context and interpretation of the data returned by tools
+- When tools are unavailable, clearly state the limitations of your response
+
+**Response Standards:**
+- Structure responses with clear sections (Overview, Analysis, Key Points, etc.)
+- Include relevant metrics, trends, and technical indicators when available
+- Provide balanced perspectives including both opportunities and risks
+- Use bullet points and formatting for better readability
+
+**Important Disclaimers:**
+- All information provided is for educational and informational purposes only
+- This is not financial advice or investment recommendations
+- Users should conduct their own research and consult financial advisors
+- Past performance does not guarantee future results
+- Market data may not be real-time and could have delays
+
+**Communication Style:**
+- Professional yet approachable tone
+- Factual and objective analysis
+- Clear explanations of technical terms
+- Responsive to user's specific questions and concerns
+
+Always prioritize accuracy, transparency, and user education in your responses."""
+            
             self._agent = create_react_agent(
                 model=self.llm,
                 tools=tools,
+                prompt=system_prompt,
             )
         return self._agent
 
     async def process_query(self, query: str) -> Dict[str, Any]:
-        # NLU 서비스가 미구현이므로 주석처리하고 직접 에이전트로 처리
-        # analysis_result = analyze(query)
-        # intent = analysis_result.intent
-        # entities = analysis_result.entities
-
-        # if intent == "market_analysis":
-        #     symbol = entities.get("stock_code")
-        #     if not symbol:
-        #         return {"error": "주식 코드를 찾을 수 없습니다."}
-        #
-        #     result = await self.market_service.analyze_market(
-        #         symbol=symbol,
-        #         analysis_type=entities.get("analysis_type", "technical")
-        #     )
-        #     return {"intent": intent, "result": result}
-        #
-        # elif intent in ["strategy_creation", "strategy_execution"]:
-        #     result = await self.trading_service.create_strategy(entities)
-        #     return {"intent": intent, "result": result}
-        #
-        # else:
-        #     agent = await self.get_agent()
-        #     result = await agent.ainvoke({"messages": [("user", query)]})
-        #     return {"intent": "agent_response", "result": result}
-
-        # 현재는 모든 쿼리를 에이전트로 직접 처리
+        """Process user query directly with agent."""
         agent = await self.get_agent()
         result = await agent.ainvoke({"messages": [("user", query)]})
         return {"intent": "agent_response", "result": result}

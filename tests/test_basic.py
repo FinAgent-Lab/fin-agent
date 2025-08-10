@@ -74,31 +74,20 @@ class TestMarketAnalysisService:
         assert hasattr(market_service, "base_url")
         assert hasattr(market_service, "analyze_market")
 
-    @pytest.mark.asyncio
-    async def test_fallback_analysis(self, market_service):
-        """Test the fallback analysis functionality."""
-        # Test with a known stock
-        result = await market_service._get_fallback_analysis("테슬라 분석")
+    def test_fallback_functionality(self, market_service):
+        """Test the _simple_fallback method functionality."""
+        # Test the actual fallback method that exists
+        result = market_service._simple_fallback("테슬라 분석", "test error")
 
         assert result is not None
         assert "query" in result
         assert "answer" in result
         assert "timestamp" in result
         assert "source" in result
-        assert result["source"] == "fallback_analysis"
+        assert "error" in result
+        assert result["source"] == "fallback"
+        assert result["status"] == "api_unavailable"
         assert result["query"] == "테슬라 분석"
-        assert "테슬라" in result["answer"]
-
-    @pytest.mark.asyncio
-    async def test_fallback_analysis_unknown_stock(self, market_service):
-        """Test fallback analysis with unknown stock."""
-        result = await market_service._get_fallback_analysis("일반적인 시장 분석")
-
-        assert result is not None
-        assert "query" in result
-        assert "answer" in result
-        assert result["source"] == "fallback_analysis"
-        assert "시장 분석 결과" in result["answer"]
 
 
 class TestConfiguration:
@@ -155,8 +144,7 @@ class TestApplicationHealth:
             except ImportError:
                 pytest.fail(f"Required package '{package}' is not available")
 
-    @pytest.mark.asyncio
-    async def test_basic_service_functionality(self):
+    def test_basic_service_functionality(self):
         """Test that services can perform basic operations."""
         from meta_supervisor.services.market_analysis_service import (
             MarketAnalysisService,
@@ -164,11 +152,13 @@ class TestApplicationHealth:
 
         service = MarketAnalysisService()
 
-        # Test that fallback analysis works
-        result = await service._get_fallback_analysis("test query")
+        # Test that fallback functionality works
+        result = service._simple_fallback("test query", "test error")
         assert result is not None
         assert isinstance(result, dict)
         assert "answer" in result
+        assert "source" in result
+        assert result["source"] == "fallback"
 
 
 if __name__ == "__main__":
