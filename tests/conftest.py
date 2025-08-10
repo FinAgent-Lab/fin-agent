@@ -6,6 +6,13 @@ import os
 import pytest
 from unittest.mock import patch
 
+# Set up environment variables at module level for test collection
+os.environ.setdefault("OPENAI_API_KEY", "test-openai-key-for-testing")
+os.environ.setdefault("MARKET_ANALYSIS_API_BASE_URL", "http://localhost:8001/test")
+os.environ.setdefault("TRADING_STRATEGY_API_BASE_URL", "http://localhost:8002/test")
+os.environ.setdefault("MAIN_LLM_MODEL", "gpt-4o-mini")
+os.environ.setdefault("ENVIRONMENT", "testing")
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
