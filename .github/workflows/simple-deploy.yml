@@ -2,7 +2,7 @@ name: Simple Deploy to Self-Hosted Runner
 
 on:
   push:
-    branches: [ main, develop, dev, feat/18 ]
+    branches: [ main, develop, dev, fix/17 ]
   workflow_dispatch:
 
 jobs:
