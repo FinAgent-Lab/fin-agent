@@ -9,7 +9,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Add simple HTTP logging middleware
 app.add_middleware(SimpleLoggingMiddleware)
 
 app.include_router(api.router, prefix="/api")

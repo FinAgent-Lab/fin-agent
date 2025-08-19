@@ -22,7 +22,6 @@ async def process_request(request: schemas.UserRequest):
 
         return schemas.CommonResponse(data=final_result)
     except Exception as e:
-        # Catch all exceptions for now and return a standardized error
         return schemas.CommonResponse(
             success=False,
             data=None,
@@ -42,19 +41,19 @@ async def query(
     try:
         result = await agent_service.process_query(request.query)
         
-        # 안전한 문자열 추출
+        # Safe string extraction
         raw_result = result.get("result")
         if isinstance(raw_result, str):
             answer = raw_result
         elif isinstance(raw_result, dict) and "messages" in raw_result:
-            # AI 메시지 내용 추출
+            # Extract AI message content
             messages = raw_result["messages"]
             if messages and hasattr(messages[-1], 'content'):
                 answer = messages[-1].content
             else:
                 answer = str(raw_result)
         else:
-            answer = str(raw_result) if raw_result is not None else "응답을 처리할 수 없습니다."
+            answer = str(raw_result) if raw_result is not None else "Unable to process response."
         
         return schemas.ResponseBody(answer=answer)
     except Exception as e:
