@@ -10,7 +10,7 @@ class MarketAnalysisInput(BaseModel):
 
     query: str = Field(
         ...,
-        description="Market analysis query (e.g., '삼성전자 기술적 분석', '시장 전망 분석')",
+        description="Market research and fundamental analysis query (e.g., '삼성전자 기업 분석', '반도체 산업 전망', '경제 지표 분석', '시장 센티먼트', '기업 실적 분석')",
     )
 
 
@@ -20,7 +20,7 @@ class MarketAnalysisTool(BaseAPITool):
     """
 
     name: str = "market_analysis"
-    description: str = "해당 주식에 대한 자세한 시장 분석 보고서를 생성합니다. Analyze stock market data for given symbols with technical or fundamental analysis and generate comprehensive market analysis reports"
+    description: str = "시장 분석 에이전트 - 기업 기본 분석, 산업 동향, 경제 지표, 시장 센티먼트를 분석합니다. Generate comprehensive market research reports including fundamental analysis, sector trends, economic indicators, company financials, and market sentiment analysis for investment decision support"
     args_schema: type[BaseModel] = MarketAnalysisInput
     service: MarketAnalysisService = Field(default=None, exclude=True)
 

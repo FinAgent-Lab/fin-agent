@@ -50,8 +50,8 @@ jobs:
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL=${{ vars.OPENAI_BASE_URL || 'https://api.openai.com/v1' }}
           MAIN_LLM_MODEL=${{ vars.MAIN_LLM_MODEL || 'google/gemini-2.5-pro' }}
-          TRADING_STRATEGY_API_BASE_URL=${{ vars.TRADING_STRATEGY_API_BASE_URL || 'http://trading-strategy-team/api/v1' }}
-          MARKET_ANALYSIS_API_BASE_URL=${{ vars.MARKET_ANALYSIS_API_BASE_URL || 'http://backend-ma' }}
+          TRADING_STRATEGY_API_BASE_URL=${{ secrets.TRADING_STRATEGY_API_BASE_URL || 'http://trading-strategy-team/api/v1' }}
+          MARKET_ANALYSIS_API_BASE_URL=${{ secrets.MARKET_ANALYSIS_API_BASE_URL || 'http://backend-ma' }}
           EOF
       
       - name: Clean Docker build cache

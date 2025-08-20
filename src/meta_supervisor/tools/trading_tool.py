@@ -1,45 +1,60 @@
-from typing import Any, Dict
+"""
+Trading Tool for message-based API interaction.
+"""
+from typing import Dict, Any
 from pydantic import BaseModel, Field
 
 from .base_tool import BaseAPITool
 from ..services.trading_service import TradingService
 
 
-class TradingStrategyInput(BaseModel):
-    """Input schema for trading strategy tool."""
-
-    parameters: Dict[str, Any] = Field(..., description="Trading strategy parameters")
+class TradingInput(BaseModel):
+    """Input schema for trading tool."""
+    message: str = Field(
+        ..., 
+        description="Trading analysis or execution query (e.g., '삼성전자 차트 분석', 'RSI 지표 확인', '매수 시점 분석', '포트폴리오 리밸런싱', '기술적 분석', '매매 전략')"
+    )
 
 
 class TradingTool(BaseAPITool):
     """
-    Tool for creating trading strategies using the trading service.
+    Tool for interacting with the trading service using message-based API.
+    
+    Sends simple message queries and receives role/content responses.
     """
-
-    name: str = "trading_strategy"
-    description: str = "Create and backtest trading strategies with given parameters"
-    args_schema: type[BaseModel] = TradingStrategyInput
-
+    
+    name: str = "trading"
+    description: str = "매매 에이전트 - 주식 거래, 차트 분석, 기술적 지표 분석을 수행합니다. Execute trading strategies, chart analysis, technical indicators (RSI, MACD, Bollinger Bands), price pattern recognition, portfolio management, and risk assessment for informed trading decisions"
+    args_schema: type[BaseModel] = TradingInput
+    service: TradingService = Field(default=None, exclude=True)
+    
     def __init__(self):
-        self.service = TradingService()
-        super().__init__(client=self.service)
-
-    async def _arun(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
+        service = TradingService()
+        super().__init__(client=service)
+        self.__dict__["service"] = service
+    
+    async def _arun(self, message: str) -> Dict[str, Any]:
         """
-        Create a trading strategy with the given parameters.
+        Send a trading query message.
+        
+        Args:
+            message: Query message to send
+            
+        Returns:
+            Dictionary with role, content, and success status
         """
         try:
-            response = await self.service.create_strategy(parameters)
-
+            response = await self.service.send_query(message)
+            
             return {
-                "strategy_id": response.strategy_id,
-                "backtest_result": response.backtest_result,
-                "chart_url": response.chart_url,
-                "parameters": parameters,
+                "role": response.role,
+                "content": response.content,
+                "success": response.role != "error"
             }
-
+            
         except Exception as e:
             return {
-                "error": f"Trading strategy creation failed: {str(e)}",
-                "parameters": parameters,
+                "role": "error",
+                "content": f"Failed to process trading query: {str(e)}",
+                "success": False
             }
